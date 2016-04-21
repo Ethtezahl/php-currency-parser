@@ -3,58 +3,71 @@
 
 /**
  * Format the text output
- * Inspired by Aura\Cli\Stdio\Formatter
+ * Inspired by Aura\Cli\Stdio\Formatter (https://github.com/auraphp/Aura.Cli)
  *
- * @param  string $str
+ * @param string $str
  *
  * @return string
  */
-function writeln($str)
+function outln($str)
 {
     static $formatter;
+    static $func;
     static $regex;
     static $codes = [
-        'reset'     => '0',
-        'bold'      => '1',
-        'dim'       => '2',
-        'ul'        => '4',
-        'blink'     => '5',
-        'reverse'   => '7',
-        'black'     => '30',
-        'red'       => '31',
-        'green'     => '32',
-        'yellow'    => '33',
-        'blue'      => '34',
-        'magenta'   => '35',
-        'cyan'      => '36',
-        'white'     => '37',
-        'blackbg'   => '40',
-        'redbg'     => '41',
-        'greenbg'   => '42',
-        'yellowbg'  => '43',
-        'bluebg'    => '44',
-        'magentabg' => '45',
-        'cyanbg'    => '46',
-        'whitebg'   => '47',
+        'reset'      => '0',
+        'bold'       => '1',
+        'dim'        => '2',
+        'underscore' => '4',
+        'blink'      => '5',
+        'reverse'    => '7',
+        'hidden'     => '8',
+        'black'      => '30',
+        'red'        => '31',
+        'green'      => '32',
+        'yellow'     => '33',
+        'blue'       => '34',
+        'magenta'    => '35',
+        'cyan'       => '36',
+        'white'      => '37',
+        'blackbg'    => '40',
+        'redbg'      => '41',
+        'greenbg'    => '42',
+        'yellowbg'   => '43',
+        'bluebg'     => '44',
+        'magentabg'  => '45',
+        'cyanbg'     => '46',
+        'whitebg'    => '47',
     ];
 
-    if (null === $regex) {
-        $regex = ',<<\s*((('.implode('|', array_keys($codes)).')(\s*))+)>>,Umsi';
-        $formatter = (false === strpos(strtolower(PHP_OS), 'win')) ? function(array $matches) use ($codes) {
+    if (null !== $regex) {
+        return $func($regex, $formatter, $str).PHP_EOL;
+    }
+
+    $regex = ',<<\s*((('.implode('|', array_keys($codes)).')(\s*))+)>>,Umsi';
+    $formatter = '';
+    $func = 'preg_replace';
+    if (false === strpos(strtolower(PHP_OS), 'win')) {
+        $formatter = function (array $matches) use ($codes) {
             $str = preg_replace('/(\s+)/msi', ';', $matches[1]);
 
             return chr(27) . '[' . strtr($str, $codes) . 'm';
-        } : '';
+        };
+        $func = 'preg_replace_callback';
     }
 
-    return preg_replace_callback($regex, $formatter, $str).PHP_EOL;
+    return $func($regex, $formatter, $str).PHP_EOL;
+}
+
+if (PHP_SAPI !== 'cli') {
+    die('This script should be invoked via the CLI version of PHP, not the '.PHP_SAPI.' SAPI'.PHP_EOL);
 }
 
 $autoload = dirname(__DIR__).'/vendor/autoload.php';
 if (!file_exists($autoload)) {
     $autoload = realpath(dirname(__DIR__).'/../../autoload.php');
     if (!file_exists($autoload)) {
-        echo writeln(
+        echo outln(
 '<<redbg white>>You must set up the project dependencies, using composer: '
 .PHP_EOL
 .'php composer install<<reset>>'
@@ -71,14 +84,14 @@ if ($argc == 2 && is_dir($argv[1])) {
 }
 
 try {
-    echo writeln('<<yellow>> Updating Currency List '.PHP_EOL.' ====================== <<reset>>');
+    echo outln('<<yellow>> Updating Currency List '.PHP_EOL.' ====================== <<reset>>');
     $manager = new \Pcp\PublicListManager($cacheDir);
     $manager->refreshList();
-    echo writeln('<<green>> Update completed with success <<reset>>');
+    echo outln('<<green>> Update completed with success <<reset>>');
     die(0);
 } catch (Exception $e) {
     echo PHP_EOL;
-    echo writeln('<<redbg white>> An error occurred while updating the Currency List:'
+    echo outln('<<redbg white>> An error occurred while updating the Currency List:'
 .PHP_EOL. ' '.$e->getMessage().' <<reset>>'
     );
     die(1);

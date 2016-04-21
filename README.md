@@ -165,7 +165,7 @@ foreach ($collection as $alphaCode => $currency) {
 }
 
 $euro = $collection['EUR']; // $euro is a Pcp\Currency object for the euro currency
-isset($collection['US']);   // returns true
+isset($collection['USD']);  // returns true
 count($collection);         // returns the number of Currency available in a given collection
 ```
 
