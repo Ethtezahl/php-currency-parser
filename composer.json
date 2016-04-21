@@ -1,0 +1,63 @@
+{
+    "name": "nyamsprod/php-currency-parser",
+    "type": "library",
+    "description": "Manipulating ISO 4217 code List in PHP",
+    "homepage": "https://github.com/nyamsprod/php-currency-parser",
+    "support": {
+        "issues": "https://github.com/nyamsprod/php-currency-parser/issues",
+        "source": "https://github.com/nyamsprod/php-currency-parser"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+          "name": "Ignace Nyamagana Butera",
+          "email": "nyamsprod@gmail.com"
+        },
+        {
+          "name": "Rob Bast",
+          "email": "rob.bast@gmail.com"
+        },
+        {
+          "name": "Kotlyar Maksim",
+          "email": "kotlyar.maksim@gmail.com"
+        }
+    ],
+    "keywords": [
+        "ISO 4217",
+        "ISO",
+        "4217",
+        "currencies",
+        "library"
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "guzzlehttp/guzzle": "^6.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.0",
+        "mikey179/vfsStream": "^1.6",
+        "fabpot/php-cs-fixer": "^1.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pcp\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Pcp\\Tests\\": "test"
+        }
+    },
+    "bin": [
+        "bin/update-currency-list"
+    ],
+    "scripts": {
+        "test": "phpunit --coverage-text; php-cs-fixer fix -v --diff --dry-run;",
+        "post-install-cmd": "php bin/update-currency-list"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

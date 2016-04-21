@@ -1,0 +1,85 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Format the text output
+ * Inspired by Aura\Cli\Stdio\Formatter
+ *
+ * @param  string $str
+ *
+ * @return string
+ */
+function writeln($str)
+{
+    static $formatter;
+    static $regex;
+    static $codes = [
+        'reset'     => '0',
+        'bold'      => '1',
+        'dim'       => '2',
+        'ul'        => '4',
+        'blink'     => '5',
+        'reverse'   => '7',
+        'black'     => '30',
+        'red'       => '31',
+        'green'     => '32',
+        'yellow'    => '33',
+        'blue'      => '34',
+        'magenta'   => '35',
+        'cyan'      => '36',
+        'white'     => '37',
+        'blackbg'   => '40',
+        'redbg'     => '41',
+        'greenbg'   => '42',
+        'yellowbg'  => '43',
+        'bluebg'    => '44',
+        'magentabg' => '45',
+        'cyanbg'    => '46',
+        'whitebg'   => '47',
+    ];
+
+    if (null === $regex) {
+        $regex = ',<<\s*((('.implode('|', array_keys($codes)).')(\s*))+)>>,Umsi';
+        $formatter = (false === strpos(strtolower(PHP_OS), 'win')) ? function(array $matches) use ($codes) {
+            $str = preg_replace('/(\s+)/msi', ';', $matches[1]);
+
+            return chr(27) . '[' . strtr($str, $codes) . 'm';
+        } : '';
+    }
+
+    return preg_replace_callback($regex, $formatter, $str).PHP_EOL;
+}
+
+$autoload = dirname(__DIR__).'/vendor/autoload.php';
+if (!file_exists($autoload)) {
+    $autoload = realpath(dirname(__DIR__).'/../../autoload.php');
+    if (!file_exists($autoload)) {
+        echo writeln(
+'<<redbg white>>You must set up the project dependencies, using composer: '
+.PHP_EOL
+.'php composer install<<reset>>'
+        );
+        die(65);
+    }
+}
+
+require $autoload;
+
+$cacheDir = null;
+if ($argc == 2 && is_dir($argv[1])) {
+    $cacheDir = $argv[1];
+}
+
+try {
+    echo writeln('<<yellow>> Updating Currency List '.PHP_EOL.' ====================== <<reset>>');
+    $manager = new \Pcp\PublicListManager($cacheDir);
+    $manager->refreshList();
+    echo writeln('<<green>> Update completed with success <<reset>>');
+    die(0);
+} catch (Exception $e) {
+    echo PHP_EOL;
+    echo writeln('<<redbg white>> An error occurred while updating the Currency List:'
+.PHP_EOL. ' '.$e->getMessage().' <<reset>>'
+    );
+    die(1);
+}
