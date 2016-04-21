@@ -5,9 +5,13 @@ PHP Currency Parser
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 [![Latest Version](https://img.shields.io/github/release/nyamsprod/php-currency-parser.svg?style=flat-square)](https://github.com/nyamsprod/php-currency-parser/releases)
 
-**PHP Currency Parser** enable integrating and manipulating the [ISO 4217 Code List](http://www.currency-iso.org/dam/downloads/lists/) in PHP.
+**PHP Currency Parser** enable integrating and manipulating the [ISO 4217 Code List](http://www.currency-iso.org/dam/downloads/lists/) in PHP codebase.
 
-This work is a **fork** of [payum/iso4217](https://github.com/payum/iso4217)
+This work is **heavily** inspired by
+
+- [payum/iso4217](https://github.com/payum/iso4217)
+- [alcohol/iso4217](https://github.com/alcohol/iso4217)
+- [PHP Domain Parser](https://github.com/jeremykendall/php-domain-parser)
 
 What is ISO 4217 ?
 -------
