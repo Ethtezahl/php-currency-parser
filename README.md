@@ -86,16 +86,17 @@ Obtaining, writing and caching the currency list is done using the `Pcp\PublicLi
 The `Pcp\PublicListManager` constructor can takes 2 optional arguments:
 
 - a directory path if you prefer another location to write and cache the currency listing instead of the library `data` directory.
-- a `GuzzleHttp\Client` object to suite your own requirements
+- a `Pcp\Http\Client` implementing object to suite your own requirements
 
 ``` php
 <?php
 
 use Pcp\PublicListManager;
+use Pcp\Http\CurlClient;
 
 $cacheDir = '/another/path';
-
-$manager = new PublicListManager($cacheDir);
+$httpClient = new CurlClient();
+$manager = new PublicListManager($cacheDir, httpClient);
 $collection = $manager->getList();
 ```
 

@@ -13,7 +13,8 @@
 */
 namespace Pcp;
 
-use GuzzleHttp\Client;
+use Pcp\Http\Client;
+use Pcp\Http\CurlClient;
 use RuntimeException;
 use SimpleXMLElement;
 
@@ -49,7 +50,7 @@ class PublicListManager
      * Public constructor.
      *
      * @param string $cacheDir   Optional cache directory
-     * @param Client $httpClient Optional Guzzle Client
+     * @param Client $httpClient Optional Http Client
      */
     public function __construct($cacheDir = null, Client $httpClient = null)
     {
@@ -58,7 +59,7 @@ class PublicListManager
         }
 
         if (is_null($httpClient)) {
-            $httpClient = new Client();
+            $httpClient = new CurlClient();
         }
 
         $this->cacheDir = $cacheDir;
@@ -106,18 +107,13 @@ class PublicListManager
      * @param string $uri
      * @param string $filename Filename in cache dir where data will be written
      *
-     * @throws RuntimeException If an error occurs while fetch or writing the data
-     *
      * @return int Number of bytes that were written to the file
      */
     protected function fetch($uri, $filename)
     {
-        $res = $this->httpClient->get($uri, ['http_errors' => false]);
-        if ($res->getStatusCode() >= 400) {
-            throw new RuntimeException('An error occurs while retrieving the Currency Data');
-        }
+        $body = $this->httpClient->getBody($uri);
 
-        return $this->write($filename, $res->getBody());
+        return $this->write($filename, $body);
     }
 
     /**

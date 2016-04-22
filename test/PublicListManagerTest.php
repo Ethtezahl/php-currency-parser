@@ -2,12 +2,9 @@
 
 namespace Pcp\Tests;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
 use org\bovigo\vfs\vfsStream;
 use Pcp\Collection;
+use Pcp\Http\Client;
 use Pcp\PublicListManager;
 use PHPUnit_Framework_TestCase as TestCase;
 
@@ -137,13 +134,10 @@ EOF;
     }
 ]
 JSON;
-
-        $mock = new MockHandler([
-            new Response(200, [], $bodyXML),
-            new Response(200, [], $bodyJson),
-        ]);
-        $handler = HandlerStack::create($mock);
-        $this->client = new Client(['handler' => $handler]);
+        $this->client = $this->getMock(Client::class);
+        $this->client
+            ->method('getBody')
+            ->will($this->onConsecutiveCalls($bodyXML, $bodyJson));
 
         $this->root = vfsStream::setup('foo');
         vfsStream::create(['cache' => []], $this->root);
@@ -157,7 +151,7 @@ JSON;
         $this->manager = null;
         $this->cacheDir = null;
         $this->root = null;
-        $this->handler = null;
+        $this->client = null;
     }
 
     public function testRefresh()
@@ -175,20 +169,6 @@ JSON;
     {
         $this->assertInstanceOf(Collection::class, (new PublicListManager())->getList());
         $this->assertInstanceOf(Collection::class, $this->manager->getList());
-    }
-
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testFetchExternalRessourcesFailed()
-    {
-        $mock = new MockHandler([
-            new Response(400, []),
-        ]);
-        $handler = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handler]);
-        $manager = new PublicListManager($this->cacheDir, $client);
-        $manager->refreshList();
     }
 
     /**
