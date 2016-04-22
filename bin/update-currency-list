@@ -85,14 +85,19 @@ if ($argc == 2 && is_dir($argv[1])) {
 
 try {
     echo outln('<<yellow>> Updating Currency List '.PHP_EOL.' ====================== <<reset>>');
-    $manager = new \Pcp\PublicListManager($cacheDir);
+    $manager = new Pcp\PublicListManager($cacheDir);
     $manager->refreshList();
-    echo outln('<<green>> Update completed with success <<reset>>');
+    $nbCurrencies = count($manager->getList());
+    echo outln(
+        '<<green>> Update completed with success.'.PHP_EOL
+        .'<<white>> You have stored <<yellow>>'.$nbCurrencies.'<<white>> currencies <<reset>>'
+    );
     die(0);
 } catch (Exception $e) {
     echo PHP_EOL;
-    echo outln('<<redbg white>> An error occurred while updating the Currency List:'
-.PHP_EOL. ' '.$e->getMessage().' <<reset>>'
+    echo outln(
+        '<<redbg white>> An error occurred while refreshing the currency List:'.PHP_EOL
+        . ' '.$e->getMessage().' <<reset>>'
     );
     die(1);
 }
